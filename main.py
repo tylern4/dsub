@@ -11,34 +11,27 @@ import os
 ## My libraries
 from logs import *
 from temp_dir import cd, tempdir
-from batch import batch, make_list
-
+from batch import batch
+from xml_parse import xml_parse
 
 def main():
     # Make argument parser
     parser = argparse.ArgumentParser(description="A PBS system for docker")
-    parser.add_argument('-c', dest='cores', type=int, nargs='?', help="Number of cores to use if not all the cores", default=0)
-    parser.add_argument('-n', dest='num', type=int, nargs='?', help="Number of simulations to do", default=10)
-    parser.add_argument('-o', dest='output', type=str, nargs='?', help="Output directory for final root files", default=".")
+    parser.add_argument('-x', dest='xml_file', type=str, nargs='?', help="xml_file", default="test.xml")
     parser.add_argument('-p', dest='prog', help="Use Progress Bar", action='store_true')
     parser.set_defaults(prog=False)
 
     args = parser.parse_args()
 
-    # Make sure file paths have ending /
-    if args.output[-1] != '/':
-        args.output = args.output + '/'
-    if args.cores == 0 or cpu_count > cpu_count():
-        args.cores = cpu_count()
+    xml_data = xml_parse(args.xml_file)
 
-    files = make_list(args)
-    pool = Pool(processes=args.cores)
+    pool = Pool(processes=xml_data[0]['num_cores'])
 
     if has_prog and args.prog:
-        for _ in tqdm.tqdm(pool.imap_unordered(batch, files), total=args.num):
+        for _ in tqdm.tqdm(pool.imap_unordered(batch, xml_data), total=xml_data[0]['count']):
             pass
     else:
-        pool.map(batch, files)
+        pool.map(batch, xml_data)
 
     # Close and join pool
     pool.close()
