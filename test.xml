@@ -1,12 +1,12 @@
 <Request>
   <Docker name="tylern4/clas6:latest" />
   <Memory space="1" unit="GB"/>
-  <Cores num="2"/>
+  <Cores num="1"/>
   <NumOfJobs num="200"/>
 
   <Job>
     <Name name="e1d_sim_$"/>
-    <Input src="/home/tylern/physics_code/current/simulations/aao_rad.test" dest="aao_rad.inp"/>
+    <Input src="/home/tylern/physics_code/current/simulations/aao_rad.inp" dest="aao_rad.inp"/>
     <Input src="/home/tylern/physics_code/current/simulations/gsim.inp" dest="gsim.inp"/>
 
     <Script src="/home/tylern/physics_code/current/simulations/do_sim.sh" dest="script.sh"/>

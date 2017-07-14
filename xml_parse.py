@@ -6,9 +6,24 @@ def into_list(xml_data):
     from datetime import datetime
     time = datetime.now().strftime('%m_%d_%Y_%H%M_')
     l = []
-    for i in range(0,int(xml_data['count'])):
-        xml_data['execute'] = time+str(i)
-        l.append(xml_data)
+    for i in range(0,xml_data['count']):
+        temp = xml_data.copy()
+        temp['ID'] = time+str(i)
+        temp['job_name_template'] = temp['job_name_template'].replace("$",temp['ID'])
+        
+        #TODO Get $ replace working for input/output files
+        l.append(temp)
+    return l
+
+def get_list(temp):
+    l = []
+    try:
+        for x in temp:
+            l.append({'src': x['@src'], 'dest': x['@dest']})
+    except:
+        l.append({'src': temp['@src'], 'dest': temp['@dest']})
+    else:
+        pass
     return l
 
 
@@ -35,7 +50,7 @@ def xml_parse(xml_file):
         num_cores = cpu_count()
 
     try:
-        count = doc['NumOfJobs']['@num']
+        count = int(doc['NumOfJobs']['@num'])
     except:
         count = int(1)
 
@@ -44,48 +59,21 @@ def xml_parse(xml_file):
     except:
         job_name_template = False
 
-    input_list = []
-    output_list = []
-    scripts_list = []
-
-    temp = doc['Job']['Input']
-    try:
-        for x in temp:
-            input_list.append({'src': x['@src'], 'dest': x['@dest']})
-    except:
-        input_list.append({'src': temp['@src'], 'dest': temp['@dest']})
-    else:
-        pass
-
-    temp = doc['Job']['Output']
-    try:
-        for x in temp:
-            output_list.append({'src': x['@src'], 'dest': x['@dest']})
-    except:
-        output_list.append({'src': temp['@src'], 'dest': temp['@dest']})
-    else:
-        pass
-
-    temp = doc['Job']['Script']
-    try:
-        for x in temp:
-            scripts_list.append({'src': x['@src'], 'dest': x['@dest']})
-    except:
-        scripts_list.append({'src': temp['@src'], 'dest': temp['@dest']})
-    else:
-        pass
+    input_list = get_list(doc['Job']['Input'])
+    output_list = get_list(doc['Job']['Output'])
+    scripts_list = get_list(doc['Job']['Script'])
 
     xml_data = {
-    'docker_image': docker_image,
-    'memory_space': memory_space,
-    'memory_unit': memory_unit,
-    'num_cores': num_cores,
-    'count': count,
-    'job_name_template': job_name_template,
-    'input_list': input_list,
-    'output_list': output_list,
-    'scripts_list': scripts_list,
-    'execute': False
+        'docker_image': docker_image,
+        'memory_space': memory_space,
+        'memory_unit': memory_unit,
+        'num_cores': num_cores,
+        'count': count,
+        'job_name_template': job_name_template,
+        'input_list': input_list,
+        'output_list': output_list,
+        'scripts_list': scripts_list,
+        'ID': False
     }
 
     xml_data = into_list(xml_data)

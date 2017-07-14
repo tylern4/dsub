@@ -4,7 +4,7 @@ import os
 from temp_dir import cd, tempdir
 
 def batch(files):
-    pprint.pprint(files)
+    #pprint.pprint(files)
     with tempdir() as dirpath:
         pass
         #shutil.copyfile(cwd+"/aao_rad.inp", dirpath+"/aao_rad.inp")

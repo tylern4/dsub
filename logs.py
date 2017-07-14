@@ -1,4 +1,5 @@
 from __future__ import print_function
+from pprint import pprint
 ## Optional to have color printing
 try:
     from termcolor import cprint
