@@ -1,8 +1,8 @@
 <Request>
   <Docker name="tylern4/clas6:latest" />
   <Memory space="1" unit="GB"/>
-  <Cores num="1"/>
-  <NumOfJobs num="200"/>
+  <Cores num="4"/>
+  <NumOfJobs num="400"/>
 
   <Job>
     <Name name="e1d_sim_$"/>

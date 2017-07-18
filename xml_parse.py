@@ -1,21 +1,23 @@
 from logs import *
 import xmltodict
 from multiprocessing import cpu_count
+from copy import deepcopy
 
-def into_list(xml_data):
+def _into_list(xml_data):
     from datetime import datetime
-    time = datetime.now().strftime('%m_%d_%Y_%H%M_')
+    time = datetime.now().strftime('%m_%d_%Y_%H%M')
     l = []
     for i in range(0,xml_data['count']):
-        temp = xml_data.copy()
-        temp['ID'] = time+str(i)
-        temp['job_name_template'] = temp['job_name_template'].replace("$",temp['ID'])
-        
-        #TODO Get $ replace working for input/output files
+        temp = deepcopy(xml_data)
+        temp['ID'] = time+"_"+str(i)
+
+        if temp['job_name']:
+            temp['job_name'] = temp['job_name'].replace("$",temp['ID'])
+
         l.append(temp)
     return l
 
-def get_list(temp):
+def _get_list(temp):
     l = []
     try:
         for x in temp:
@@ -55,13 +57,13 @@ def xml_parse(xml_file):
         count = int(1)
 
     try:
-        job_name_template = doc['Job']['Name']['@name']
+        job_name = doc['Job']['Name']['@name']
     except:
-        job_name_template = False
+        job_name = False
 
-    input_list = get_list(doc['Job']['Input'])
-    output_list = get_list(doc['Job']['Output'])
-    scripts_list = get_list(doc['Job']['Script'])
+    input_list = _get_list(doc['Job']['Input'])
+    output_list = _get_list(doc['Job']['Output'])
+    script = _get_list(doc['Job']['Script'])[0]
 
     xml_data = {
         'docker_image': docker_image,
@@ -69,12 +71,12 @@ def xml_parse(xml_file):
         'memory_unit': memory_unit,
         'num_cores': num_cores,
         'count': count,
-        'job_name_template': job_name_template,
+        'job_name': job_name,
         'input_list': input_list,
         'output_list': output_list,
-        'scripts_list': scripts_list,
+        'script': script,
         'ID': False
     }
 
-    xml_data = into_list(xml_data)
+    xml_data = _into_list(xml_data)
     return xml_data

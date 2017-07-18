@@ -31,7 +31,7 @@ def main():
         for _ in tqdm.tqdm(pool.imap_unordered(batch, xml_data), total=xml_data[0]['count']):
             pass
     else:
-        pool.map(batch, xml_data)
+        pool.map_async(batch, xml_data)
 
     # Close and join pool
     pool.close()
